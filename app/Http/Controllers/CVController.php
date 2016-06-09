@@ -61,9 +61,11 @@ class CVController extends Controller
         if (Gate::denies('view-cv', $cv)) {
             abort(403);
         }
+        $skills = $cv->Skill;
         $Records = $cv->Record;
         $Records = $Records->sortBy("Date");
-        return View::make('xCV.CVshow')->with('CV', $cv)->with('Records', $Records);
+        return View::make('xCV.CVshow')->with('CV', $cv)->with('Records', $Records)
+            ->with('skills', $skills);
     }
 
     public function show2($id)
@@ -77,7 +79,7 @@ class CVController extends Controller
         $Records = $Records->sortBy("Date");
         return View::make('xCV.CVview')->with('CV', $cv)->with('Records', $Records);
     }
-
+/*
     public function edit2($id)
     {
         // $id = $id - 14000;
@@ -89,7 +91,7 @@ class CVController extends Controller
         $Records = $Records->sortBy("Date");
         return View::make('xCV.CVedit2')->with('CV', $cv)->with('Records', $Records);
     }
-
+*/
     public function edit($id)//Get
     {
         //$id = $id - 14000;
@@ -97,9 +99,10 @@ class CVController extends Controller
         if (Gate::denies('update-cv', $cv->user_id)) {
             abort(403);
         }
+        $skills = $cv->Skill;
         $Records = $cv->Record;
         $Records = $Records->sortBy("Date");
-        return View::make('xCV.CVcreate')->with('CV', $cv)->with('Records', $Records);
+        return View::make('xCV.CVcreate')->with('CV', $cv)->with('Records', $Records) ->with('skills', $skills);
     }
 
     public function update($id, UpdateRequest $request)//PUT
@@ -124,13 +127,14 @@ class CVController extends Controller
         }
         $Records = $CV->Record;
         $Records = $Records->sortBy("Date");
-        
+        /*
         header('Expires: 0');
         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
         header('Cache-Control: private', false);
         header('Content-Encoding: UTF-8');
         header('Content-type: application/pdf; charset=UTF-8');
         setlocale(LC_ALL, 'ja_JP.UTF-8');
+        */
         $html = View::make('invoice.cv')
             ->with('CV', $CV)->with('Records', $Records)->render();
         //$html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');

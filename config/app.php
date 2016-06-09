@@ -148,6 +148,8 @@ return [
         Yajra\Datatables\DatatablesServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
+        Barryvdh\Debugbar\ServiceProvider::class,
+        Intervention\Image\ImageServiceProvider::class
         /*
         *
         */
@@ -204,6 +206,8 @@ return [
           'Html' => Collective\Html\HtmlFacade::class,
           'Datatables' => Yajra\Datatables\Datatables::class,
           'PDF' => Barryvdh\DomPDF\Facade::class,
+          'Debugbar' => Barryvdh\Debugbar\Facade::class,
+          'Image' => Intervention\Image\Facades\Image::class
          
     ],
 

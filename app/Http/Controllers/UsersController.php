@@ -3,6 +3,7 @@
 namespace app\Http\Controllers;
 
 use Carbon\Carbon;
+use File;
 use Validator;
 use Illuminate\Http\Request;
 use App\User;
@@ -10,6 +11,7 @@ use Gate;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\View;
 use Nicolaslopezj\Searchable\SearchableTrait;
+use Intervention\Image\Facades\Image;
 
 
 class UsersController extends Controller
@@ -108,6 +110,26 @@ class UsersController extends Controller
      * Update the specified resource in storage.
      *
      */
+    private function resize($image, $size, $name)
+    {
+        try
+        {
+            $extension 		= 	$image->getClientOriginalExtension();
+            $imageRealPath 	= 	$image->getRealPath();
+            $thumbName 		= 	'thumb_'. $name;
+
+            $img = Image::make($imageRealPath); // use this if you want facade style code
+            $img->resize(intval($size), null, function($constraint) {
+                $constraint->aspectRatio();
+            });
+            return $img->save(public_path('img'). '/thumbnail/'. $thumbName);
+        }
+        catch(Exception $e)
+        {
+            return false;
+        }
+
+    }
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
@@ -123,9 +145,24 @@ class UsersController extends Controller
             return redirect()->back()->withErrors($validator)->withInput($request->all());
         }
         if($request->hasFile('image')) {
+
             $file = $request->file('image');
             $timestamp = str_replace([' ', ':'], '-', Carbon::now()->toDateTimeString());
             $name = $timestamp. '-' .$file->getClientOriginalName();
+            $oldfile = public_path('img').$user->image;
+            $oldthumb = public_path('img/thumbnail').'thumb_'.$user->image;
+            if (File::exists($oldfile)){
+                File::exists($oldthumb)&&File::delete($oldthumb);
+                File::delete($oldfile);
+            }
+            /*resize*/
+            $resizedImage = $this->resize($file , '200',$name);
+            if(!$resizedImage)
+            {
+                return redirect()->back()
+                    ->withError('Could not resize Image');
+            }
+
             $user->image = $name;
             $file->move(public_path().'/img/', $name);
         }
